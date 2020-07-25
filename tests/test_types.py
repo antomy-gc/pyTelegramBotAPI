@@ -57,7 +57,7 @@ def test_json_Message_Audio():
 
 
 def test_json_Message_Sticker():
-    json_string = r'{"message_id":98,"from":{"id":10734,"first_name":"Fd","last_name":"Wd","username":"dd","is_bot":true },"chat":{"id":10734,"first_name":"Fd","type":"private","last_name":"Wd","username":"dd"},"date":1435479551,"sticker":{"width":550,"height":368,"is_animated":true,"thumb":{"file_id":"AAQFABPJLB0sAAQq17w-li3bzoIfAAIC","file_size":1822,"width":90,"height":60},"file_id":"BQADBQADNAIAAsYifgYdGJOa6bGAsQI","file_size":30320}}'
+    json_string = r'{"message_id": 21552, "from": {"id": 590740002, "is_bot": false, "first_name": "⚜️ Ƥυrуα ⚜️", "username": "Purya", "language_code": "en"}, "chat": {"id": -1001309982000, "title": "123", "type": "supergroup"}, "date": 1594068909, "sticker": {"width": 368, "height": 368, "emoji": "🤖", "set_name": "ipuryapack", "is_animated": false, "thumb": {"file_id": "AAMCBAADHQJOFL7mAAJUMF8Dj62hpmDhpRAYvkc8CtIqipolAAJ8AAPA-8cF9yxjgjkLS97A0D4iXQARtQAHbQADHy4AAhoE", "file_unique_id": "AQADwNA-Il0AAx8uAAI", "file_size": 7776, "width": 60, "height": 60}, "file_id": "CAACAgQAAx0CThS-5gACVDBfA4-toaZg4aUQGL5HWerSKoqaJQACArADwPvHBfcsY4I5C3feGgQ", "file_unique_id": "AgADfAADsPvHWQ", "file_size": 14602}}'
     msg = types.Message.de_json(json_string)
     assert msg.sticker.height == 368
     assert msg.sticker.thumb.height == 60
@@ -65,7 +65,7 @@ def test_json_Message_Sticker():
 
 
 def test_json_Message_Sticker_without_thumb():
-    json_string = r'{"message_id":98,"from":{"id":10734,"first_name":"Fd","last_name":"Wd","username":"dd","is_bot":true },"chat":{"id":10734,"first_name":"Fd","type":"private","last_name":"Wd","username":"dd"},"date":1435479551,"sticker":{"width":550,"height":368,"is_animated":true,"file_id":"BQADBQADNAIAAsYifgYdGJOa6bGAsQI","file_size":30320}}'
+    json_string = r'{"message_id": 21552, "from": {"id": 590740002, "is_bot": false, "first_name": "⚜️ Ƥυrуα ⚜️", "username": "Purya", "language_code": "en"}, "chat": {"id": -1001309982000, "title": "123", "type": "supergroup"}, "date": 1594068909, "sticker": {"width": 368, "height": 368, "emoji": "🤖", "set_name": "ipuryapack", "is_animated": false, "file_id": "CAACAgQAAx0CThS-5gACVDBfA4-toaZg4aUQGL5HWerSKoqaJQACArADwPvHBfcsY4I5C3feGgQ", "file_unique_id": "AgADfAADsPvHWQ", "file_size": 14602}}'
     msg = types.Message.de_json(json_string)
     assert msg.sticker.height == 368
     assert msg.sticker.thumb is None
@@ -178,4 +178,21 @@ def test_json_poll_1():
     assert msg.poll.question is not None
     assert msg.poll.options is not None
     assert len(msg.poll.options) == 2
-    assert msg.poll.allows_multiple_answers == True
+    assert msg.poll.allows_multiple_answers is True
+
+
+def test_json_poll_answer():
+    jsonstring = r'{"poll_id": "5895675970559410186", "user": {"id": 329343347, "is_bot": false, "first_name": "Test", "username": "test_user", "last_name": "User", "language_code": "en"}, "option_ids": [1]}'
+    __import__('pprint').pprint(__import__('json').loads(jsonstring))
+    poll_answer = types.PollAnswer.de_json(jsonstring)
+    assert poll_answer.poll_id == '5895675970559410186'
+    assert isinstance(poll_answer.user, types.User)
+    assert poll_answer.options_ids == [1]
+
+
+def test_KeyboardButtonPollType():
+    markup = types.ReplyKeyboardMarkup()
+    markup.add(types.KeyboardButton('send me a poll', request_poll=types.KeyboardButtonPollType(type='quiz')))
+    json_str = markup.to_json()
+    assert 'request_poll' in json_str
+    assert 'quiz' in json_str
